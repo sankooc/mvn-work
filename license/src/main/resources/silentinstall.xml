@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<AutomatedInstallation langpack="eng">
+	<com.izforge.izpack.panels.HelloPanel
+		id="UNKNOWN (com.izforge.izpack.panels.HelloPanel)" />
+	<com.izforge.izpack.panels.LicencePanel
+		id="UNKNOWN (com.izforge.izpack.panels.LicencePanel)" />
+	<com.izforge.izpack.panels.InfoPanel
+		id="UNKNOWN (com.izforge.izpack.panels.InfoPanel)" />
+	<com.izforge.izpack.panels.PacksPanel
+		id="UNKNOWN (com.izforge.izpack.panels.PacksPanel)">
+		<pack index="0" name="JBoss" selected="true" />
+		<pack index="1" name="MDM" selected="true" />
+		<pack index="2" name="DSC" selected="true" />
+	</com.izforge.izpack.panels.PacksPanel>
+	<com.izforge.izpack.panels.TargetPanel
+		id="fullInstall">
+		<installpath>${dir}
+		</installpath>
+	</com.izforge.izpack.panels.TargetPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.0">
+		<userInput />
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.1">
+		<userInput>
+			<entry key="jboss.port.binding" value="ports-01" />
+		</userInput>
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.2">
+		<userInput />
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.3">
+		<userInput>
+			<entry key="db.type" value="H2" />
+		</userInput>
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.4">
+		<userInput>
+			<entry key="sqldb.database.password" value="" />
+			<entry key="sqldb.database.generation" value="SQLDB_PER_CONTAINER" />
+			<entry key="sqldb.database.username" value="sa" />
+		</userInput>
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.5">
+		<userInput>
+			<entry key="sqldb.database.fulltext"
+				value="${dir}/jboss-4.2.2.GA/server/default/data/indexes/H2-Default" />
+		</userInput>
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.6">
+		<userInput>
+			<entry key="workflow.package" value="BOSSP" />
+		</userInput>
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.7">
+		<userInput>
+			<entry key="tdsc.database.advanced" value="false" />
+			<entry key="tdsc.database.username" value="sa" />
+			<entry key="tdsc.database.host" value="localhost" />
+			<entry key="tdsc.database.password" value="" />
+			<entry key="tdsc.database.type" value="HSQLStandalone" />
+			<entry key="tdsc.database.name" value="tdsc_db" />
+			<entry key="tdsc.database.port" value="3306" />
+		</userInput>
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.UserInputPanel
+		id="UserInputPanel.8">
+		<userInput />
+	</com.izforge.izpack.panels.UserInputPanel>
+	<com.izforge.izpack.panels.SummaryPanel
+		id="UNKNOWN (com.izforge.izpack.panels.SummaryPanel)" />
+	<com.izforge.izpack.panels.InstallPanel
+		id="UNKNOWN (com.izforge.izpack.panels.InstallPanel)" />
+	<com.izforge.izpack.panels.FinishPanel
+		id="UNKNOWN (com.izforge.izpack.panels.FinishPanel)" />
+</AutomatedInstallation>
