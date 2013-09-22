@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.utils.BuildUtil;
 
-public abstract class AbstractJob implements IDailyJob {
+public abstract class AbstractJob implements IDailyJob,ISpecialJob {
 	private static Logger logger = LoggerFactory.getLogger(AbstractJob.class);
 
 	public void getLastVersion() {
@@ -25,5 +25,6 @@ public abstract class AbstractJob implements IDailyJob {
 			}
 		}
 	}
-	abstract protected void getSpecalVersion(String mVersion, String bVersion) throws Exception;
+
+	abstract public void getSpecalVersion(String mVersion, String bVersion) throws Exception;
 }

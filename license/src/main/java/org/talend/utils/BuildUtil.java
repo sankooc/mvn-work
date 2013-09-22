@@ -21,18 +21,17 @@ import org.talend.job.Configer;
 
 public class BuildUtil {
 	private static ApacheConnector connector = ApacheConnector.getInstance();
-	private static Logger logger = LoggerFactory.getLogger(BuildUtil.class);
+	protected static Logger logger = LoggerFactory.getLogger(BuildUtil.class);
 
 	public static Document getRecentBuildPage() {
-		String url = Configer.getBuildURL()+ "?C=M;O=D";
+		String url = Configer.getBuildURL() + "?C=M;O=D";
 		if (connector.doTest(url)) {
 			return connector.getPage(url);
 		}
 		return null;
 	}
 
-	static char[] tokens = new char[] { '0', '1', '2', '3', '4', '5', '6', '7',
-			'8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+	static char[] tokens = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 	public static String toHexString(byte[] contents) {
 		if (contents == null) {
@@ -47,7 +46,6 @@ public class BuildUtil {
 		return builder.toString();
 	}
 
-	
 	public static void unzip(File source, File target) {
 		ZipInputStream stream = null;
 		try {
@@ -79,44 +77,42 @@ public class BuildUtil {
 		}
 
 	}
-	
-	public static String[] getRecentBuildVersion() {
-		Document doc = getRecentBuildPage();
-		Elements eles = doc.getElementsMatchingOwnText(Configer.getBuildRelease());
-		Element ele = eles.get(0);
-		String text = ele.text();
-		Matcher matcher = Pattern.compile(Configer.getBuildRelease())
-				.matcher(text);
-		if (matcher.find()) {
-			return new String[] { matcher.group(1), matcher.group(2) };
-		}
-		logger.error("cannot find build");
-		return null;
-	}
+
+//	public static String[] getRecentBuildVersion() {
+//		Document doc = getRecentBuildPage();
+//		Elements eles = doc.getElementsMatchingOwnText(Configer.getBuildRelease());
+//		Element ele = eles.get(0);
+//		String text = ele.text();
+//		Matcher matcher = Pattern.compile(Configer.getBuildRelease()).matcher(text);
+//		if (matcher.find()) {
+//			return new String[] { matcher.group(1), matcher.group(2) };
+//		}
+//		logger.error("cannot find build");
+//		return null;
+//	}
 
 	public static Iterator<String[]> getRecentBuildVersionIterator() {
 		Document doc = getRecentBuildPage();
-		if(null == doc){
+		if (null == doc) {
 			return null;
 		}
-		Elements eles = doc.getElementsMatchingOwnText(Configer.getBuildRelease());
+		final String release = Configer.getBuildRelease();
+		final Pattern pattern = Pattern.compile(release);
+		Elements eles = doc.getElementsMatchingOwnText(release);
 		final Iterator<Element> ite = eles.iterator();
 		return new Iterator<String[]>() {
 			public boolean hasNext() {
 				return ite.hasNext();
 			}
-
 			public String[] next() {
 				Element ele = ite.next();
 				String text = ele.text();
-				Matcher matcher = Pattern.compile(Configer.getBuildRelease())
-						.matcher(text);
+				Matcher matcher = pattern.matcher(text);
 				if (matcher.find()) {
 					return new String[] { matcher.group(1), matcher.group(2) };
 				}
 				return null;
 			}
-
 			public void remove() {
 			}
 		};

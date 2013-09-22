@@ -34,18 +34,15 @@ import org.talend.utils.BuildUtil;
  */
 public class StudioInstaller extends AbstractJob {
 
-	private static Logger logger = LoggerFactory
-			.getLogger(StudioInstaller.class);
+	private static Logger logger = LoggerFactory.getLogger(StudioInstaller.class);
 
 	private ApacheConnector connector = ApacheConnector.getInstance();
 
 	public File installStudio(String mVersion, String bVersion) {
-		String fileName = String.format(Configer.getStudioFileFormat(), bVersion,
-				mVersion);
+		String fileName = String.format(Configer.getStudioFileFormat(), bVersion, mVersion);
 
 		File target = new File(Configer.getDataFolder());
-		if (new File(target, fileName.substring(0, fileName.length() - 4))
-				.exists()) {
+		if (new File(target, fileName.substring(0, fileName.length() - 4)).exists()) {
 			return target;
 		}
 
@@ -60,8 +57,7 @@ public class StudioInstaller extends AbstractJob {
 
 	public File download(String mVersion, String bVersion) {
 		String plainversion = mVersion.replaceAll("\\.", "");
-		String target = String.format(Configer.getStudioURLFormat(), mVersion,
-				bVersion, mVersion, plainversion, bVersion, mVersion);
+		String target = String.format(Configer.getStudioURLFormat(), mVersion, bVersion, mVersion, plainversion, bVersion, mVersion);
 
 		String md5URL = Configer.getBuildURL() + target + ".MD5";
 		logger.debug("md5 url {} ", md5URL);
@@ -70,10 +66,8 @@ public class StudioInstaller extends AbstractJob {
 			return null;
 		}
 		final byte[] md = connector.doGet(md5URL);
-		File file = new File(Configer.getDataFolder()
-				+ Configer.getStudioFolder()
-				+ String.format(Configer.getStudioFileFormat(), bVersion,
-						mVersion));
+		File file = new File(Configer.getDataFolder() + Configer.getStudioFolder()
+				+ String.format(Configer.getStudioFileFormat(), bVersion, mVersion));
 		if (file.exists()) {
 			if (checkFile(file, new String(md))) {
 				return file;
@@ -85,10 +79,10 @@ public class StudioInstaller extends AbstractJob {
 		}
 
 		String jarUrl = Configer.getBuildURL() + target;
-//		if (!connector.doTest(jarUrl)) {
-//			logger.error("no resource m:{} b:{}", mVersion, bVersion);
-//			return null;
-//		}
+		// if (!connector.doTest(jarUrl)) {
+		// logger.error("no resource m:{} b:{}", mVersion, bVersion);
+		// return null;
+		// }
 		try {
 			connector.download(jarUrl, -1, file);
 			return file;
@@ -127,8 +121,7 @@ public class StudioInstaller extends AbstractJob {
 	public void getSpecalVersion(String mVersion, String bVersion) throws Exception {
 		File file = installStudio(mVersion, bVersion);
 		if (null == file) {
-			throw new Exception("cannot install studio : " + mVersion + "-"
-					+ bVersion);
+			throw new Exception("cannot install studio : " + mVersion + "-" + bVersion);
 		}
 	}
 
@@ -137,6 +130,6 @@ public class StudioInstaller extends AbstractJob {
 	 */
 	public static void main(String[] args) {
 		StudioInstaller installer = new StudioInstaller();
-	    installer.getLastVersion();
+		installer.getLastVersion();
 	}
 }

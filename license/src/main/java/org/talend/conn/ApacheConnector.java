@@ -100,8 +100,7 @@ public class ApacheConnector {
 		client = new DefaultHttpClient(cm, params);
 
 		HttpRequestRetryHandler retryHandler = new HttpRequestRetryHandler() {
-			public boolean retryRequest(IOException exception,
-					int executionCount, HttpContext context) {
+			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
 				if (executionCount >= 5) {
 					// 超过重试次数
 					return false;
@@ -113,14 +112,11 @@ public class ApacheConnector {
 		executor = Executors.newCachedThreadPool();
 	}
 
-	public String getPageRegix(String uri, final Pattern pattern)
-			throws Exception {
+	public String getPageRegix(String uri, final Pattern pattern) throws Exception {
 		ResponseHandler<String> handler = new ResponseHandler<String>() {
-			public String handleResponse(HttpResponse response)
-					throws ClientProtocolException, IOException {
+			public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
 				InputStream stream = response.getEntity().getContent();
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(stream));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 				while (true) {
 					try {
 						String line = reader.readLine();
@@ -142,15 +138,12 @@ public class ApacheConnector {
 		return doGet(uri, handler);
 	}
 
-	public String getPageXpath(String uri, final XPathExpression expression)
-			throws Exception {
+	public String getPageXpath(String uri, final XPathExpression expression) throws Exception {
 		ResponseHandler<String> handler = new ResponseHandler<String>() {
-			public String handleResponse(HttpResponse response)
-					throws ClientProtocolException, IOException {
+			public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
 				InputStream stream = response.getEntity().getContent();
 				try {
-					return (String) expression.evaluate(
-							new InputSource(stream), XPathConstants.STRING);
+					return (String) expression.evaluate(new InputSource(stream), XPathConstants.STRING);
 				} catch (XPathExpressionException e) {
 					logger.error(e.getMessage(), e);
 				}
@@ -192,19 +185,17 @@ public class ApacheConnector {
 
 	public org.w3c.dom.Document getPageAsDoc(String addr) throws Exception {
 		ResponseHandler<org.w3c.dom.Document> handler = new ResponseHandler<org.w3c.dom.Document>() {
-			public org.w3c.dom.Document handleResponse(HttpResponse response)
-					throws ClientProtocolException, IOException {
+			public org.w3c.dom.Document handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
 				HttpEntity entity = response.getEntity();
 				try {
 					InputStream stream = entity.getContent();
-					DocumentBuilderFactory factory = DocumentBuilderFactory
-							.newInstance();
+					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 					factory.setValidating(false);
 					factory.setNamespaceAware(false);
 					DocumentBuilder builder = factory.newDocumentBuilder();
 					return builder.parse(stream);
 				} catch (Exception e) {
-					logger.error(e.getMessage(),e);
+					logger.error(e.getMessage(), e);
 				} finally {
 					EntityUtils.consume(entity);
 				}
@@ -215,8 +206,7 @@ public class ApacheConnector {
 	}
 
 	HttpRequestBase createRequest(String uri) {
-		HttpGet request = new HttpGet(uri);
-		return request;
+		return new HttpGet(uri);
 	}
 
 	void consume(HttpResponse response) {
@@ -265,8 +255,7 @@ public class ApacheConnector {
 		HttpEntity entity = response.getEntity();
 		try {
 			if (null != entity) {
-				Document document = Jsoup.parse(entity.getContent(), "UTF-8",
-						uri.toString());
+				Document document = Jsoup.parse(entity.getContent(), "UTF-8", uri.toString());
 				return document;
 			}
 		} catch (Exception e) {
@@ -285,12 +274,12 @@ public class ApacheConnector {
 		long size = 0;
 		OutputStream out = null;
 		file.getParentFile().mkdirs();
-//		if (file.exists()) {
-//			size = file.length();
-//			out = new FileOutputStream(file, true);
-//		} else {
-			out = new FileOutputStream(file);
-//		}
+		// if (file.exists()) {
+		// size = file.length();
+		// out = new FileOutputStream(file, true);
+		// } else {
+		out = new FileOutputStream(file);
+		// }
 		download(uri, out, contentSize, size);
 		out.close();
 	}
@@ -301,45 +290,81 @@ public class ApacheConnector {
 			return;
 		}
 		for (Header head : headers) {
-			logger.info("header key [{}]  value [{}]", head.getName(),
-					head.getValue());
+			logger.info("header key [{}]  value [{}]", head.getName(), head.getValue());
 		}
 	}
-	
-	public boolean doTest(String uri){
-		return doTest(uri,HttpStatus.SC_OK,null,-1);
-	}
-	//HttpStatus
-	public boolean doTest(String uri,final int status,final String contentType,final int minLenth){
-		try {
-			return doGet(uri, new ResponseHandler<Boolean>(){
 
-				public Boolean handleResponse(HttpResponse response)
-						throws ClientProtocolException, IOException {
+	public boolean doTest(String uri) {
+		return doTest(uri, HttpStatus.SC_OK, null, -1);
+	}
+
+	public boolean doTest(String uri, final int status, final String contentType, final int minLenth) {
+		try {
+			return doGet(uri, new ResponseHandler<Boolean>() {
+
+				public Boolean handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
 					int code = response.getStatusLine().getStatusCode();
 					if (status != code) {
 						logger.error("response code error : {}", code);
 						return false;
 					}
-					if(null != contentType){
+					if (null != contentType) {
 						String type = response.getHeaders("Content-Type")[0].getValue();
-						if(type.trim().equalsIgnoreCase(contentType)){
+						if (type.trim().equalsIgnoreCase(contentType)) {
 							logger.error("response type error : {}", code);
 							return false;
 						}
 					}
-					if(minLenth >0){
+					if (minLenth > 0) {
 						HttpEntity entity = response.getEntity();
 						return entity.getContentLength() > minLenth;
 					}
 					return Boolean.TRUE;
-				}});
+				}
+			});
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 		return false;
 	}
-	
+
+	public boolean checkConnector(String uri, int status, long size, String type) {
+		HttpRequestBase request = createRequest(uri);
+		HttpEntity entity = null;
+		try {
+			HttpResponse response = client.execute(request);
+			int code = response.getStatusLine().getStatusCode();
+			if (code != status) {
+				logger.error("unmatch status code {}", status);
+				return false;
+			}
+			if (null == type) {
+				String content_type = response.getHeaders("Content-Type")[0].getValue();
+				if (!content_type.startsWith(type)) {
+					logger.error("unmatch content type . expect type : {}  ,  actual : {}", content_type, type);
+					return false;
+				}
+			}
+			if (size > 0) {
+				entity = response.getEntity();
+				if (null == entity) {
+					return false;
+				}
+				return entity.getContentLength() >= size;
+			}
+			return true;
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			try {
+				request.abort();
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+		return false;
+	}
+
 	public long getResourceLength(String uri) {
 		HttpRequestBase request = createRequest(uri);
 		HttpEntity entity = null;
@@ -367,9 +392,7 @@ public class ApacheConnector {
 		return 0;
 	}
 
-	public void download(final String uri, OutputStream out,
-			final long contentSize, long size)
-			throws Exception {
+	public void download(final String uri, OutputStream out, final long contentSize, long size) throws Exception {
 		long totalLenth = contentSize;
 		if (contentSize < 1) {
 			totalLenth = getResourceLength(uri);
@@ -414,13 +437,11 @@ public class ApacheConnector {
 		try {
 			HttpResponse response = client.execute(request);
 			if (logger.isDebugEnabled()) {
-				logger.debug("response code {}", response.getStatusLine()
-						.getStatusCode());
+				logger.debug("response code {}", response.getStatusLine().getStatusCode());
 				Header[] headers = response.getAllHeaders();
 				if (null != headers && headers.length != 0) {
 					for (Header head : headers) {
-						logger.info("response headers key[{}] - value[{}]",
-								head.getName(), head.getValue());
+						logger.info("response headers key[{}] - value[{}]", head.getName(), head.getValue());
 					}
 				}
 			}
@@ -436,8 +457,7 @@ public class ApacheConnector {
 		}
 	}
 
-	public <T> T doGet(final String uri, final ResponseHandler<T> hander)
-			throws Exception {
+	public <T> T doGet(final String uri, final ResponseHandler<T> hander) throws Exception {
 		HttpRequestBase request = createRequest(uri);
 		return client.execute(request, hander);
 	}

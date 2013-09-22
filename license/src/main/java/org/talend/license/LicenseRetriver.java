@@ -35,19 +35,16 @@ public class LicenseRetriver implements IDailyJob {
 	static Logger logger = LoggerFactory.getLogger(LicenseRetriver.class);
 
 	ApacheConnector connector = ApacheConnector.getInstance();
+
 	Collection<String> versions;
 
-	public LicenseRetriver(org.w3c.dom.Document doc) {
+	public LicenseRetriver() {
 		versions = Arrays.asList(new String[] { "540", "530" });
 	}
 
 	public static void main(String[] args) {
-//		Properties pro = System.getProperties();
-//		for (Object obj : pro.keySet()) {
-//			System.out.println(obj + " = " + pro.getProperty(obj.toString()));
-//		}
-		// LicenseRetriver retriver = new LicenseRetriver(null);
-		// retriver.updateLicense();
+		LicenseRetriver retriver = new LicenseRetriver();
+		retriver.updateLicense();
 	}
 
 	public void updateLicense() {
@@ -78,8 +75,7 @@ public class LicenseRetriver implements IDailyJob {
 
 	public Collection<File> updateLicense(final String version, final File file) {
 		logger.info("start to update {} license ", version);
-		String url = String.format(
-				Configer.getBuildURL() + Configer.getLicenseURL(), version);
+		String url = String.format(Configer.getBuildURL() + Configer.getLicenseURL(), version);
 
 		Document doc = connector.getPage(url);
 		if (null == doc) {
@@ -141,62 +137,53 @@ public class LicenseRetriver implements IDailyJob {
 		return null;
 	}
 
-	Collection<File> checkout(final String version, final File root,
-			final String url) {
+	Collection<File> checkout(final String version, final File root, final String url) {
 		try {
-			return connector.doGet(url,
-					new ResponseHandler<Collection<File>>() {
+			return connector.doGet(url, new ResponseHandler<Collection<File>>() {
 
-						public Collection<File> handleResponse(
-								HttpResponse response)
-								throws ClientProtocolException, IOException {
-							Collection<File> files = new LinkedList<File>();
-							InputStream stream = response.getEntity()
-									.getContent();
-							ZipInputStream zip = new ZipInputStream(stream);
-							String regex = Configer.getLicenseFile()
-									.replaceAll("%version", version);
-							Pattern pattern = Pattern.compile(regex);
-							while (true) {
-								ZipEntry entry = zip.getNextEntry();
-								if (null == entry) {
+				public Collection<File> handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+					Collection<File> files = new LinkedList<File>();
+					InputStream stream = response.getEntity().getContent();
+					ZipInputStream zip = new ZipInputStream(stream);
+					String regex = Configer.getLicenseFile().replaceAll("%version", version);
+					Pattern pattern = Pattern.compile(regex);
+					while (true) {
+						ZipEntry entry = zip.getNextEntry();
+						if (null == entry) {
+							break;
+						}
+						try {
+							String name = entry.getName();
+							Matcher matcher = pattern.matcher(name);
+							if (matcher.find()) {
+								int count = matcher.groupCount();
+								String fname = null;
+								for (int i = 1; i <= count; i++) {
+									fname = matcher.group(i);
+									if (StringUtils.isEmpty(fname)) {
+										continue;
+									}
 									break;
 								}
-								try {
-									String name = entry.getName();
-									Matcher matcher = pattern.matcher(name);
-									if (matcher.find()) {
-										int count = matcher.groupCount();
-										String fname = null;
-										for (int i = 1; i <= count; i++) {
-											fname = matcher.group(i);
-											if (StringUtils.isEmpty(fname)) {
-												continue;
-											}
-											break;
-										}
 
-										logger.info(
-												"found a available license {}",
-												fname);
-										File target = new File(root, fname);
-										if (target.exists()) {
-											files.add(target);// TODO
-											continue;
-										}
-										FileOutputStream fos = new FileOutputStream(
-												target);
-										IOUtils.copy(zip, fos);
-										IOUtils.closeQuietly(fos);
-										files.add(target);
-									}
-								} catch (Exception e) {
-									logger.error(e.getMessage());
+								logger.info("found a available license {}", fname);
+								File target = new File(root, fname);
+								if (target.exists()) {
+									files.add(target);// TODO
+									continue;
 								}
+								FileOutputStream fos = new FileOutputStream(target);
+								IOUtils.copy(zip, fos);
+								IOUtils.closeQuietly(fos);
+								files.add(target);
 							}
-							return files;
+						} catch (Exception e) {
+							logger.error(e.getMessage());
 						}
-					});
+					}
+					return files;
+				}
+			});
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
