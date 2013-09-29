@@ -133,7 +133,7 @@ public class LicenseRetriver implements IDailyJob {
 			}
 			logger.info("no available license in build");
 		}
-		logger.error("retrive lecense failed");
+		logger.error("retrive license failed");
 		return null;
 	}
 
