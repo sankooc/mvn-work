@@ -31,28 +31,33 @@ public class StaticGraphic {
 	public void setHeight(int height) {
 		this.height = height;
 	}
-	public void init() {
-		Random random = new Random();
-		matrix = new int[width][height];
+	Random random = new Random();
+	
+	int[][] gf;
+	
+	public void init(){
 		gf = new int[width][height];
 		visit = new boolean[width][height];
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				gf[j][i] = Integer.MAX_VALUE;
-				if (random.nextInt(7) == 6) {
-					matrix[j][i] = 1;
-//					System.out.print("X");
-				} else {
-//					System.out.print("O");
-				}
 			}
-//			System.out.println();
 		}
 	}
-
-	// f(a,b) >= f(a,k) + g(k,b)
-	int[][] gf;
-
+	
+	public void createRandomMatrix(){
+		matrix = new int[width][height];
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (random.nextInt(7) == 6) {
+					matrix[j][i] = 1;
+				} else {
+				}
+			}
+		}
+	}
+	
+	
 	public void push(int x, int y, Cnode from) {
 
 		if(visit[x][y]){
@@ -82,7 +87,7 @@ public class StaticGraphic {
 		Cnode node = set.first();
 		lastNode = node;
 		set.remove(node);
-
+		visit[node.x][node.y] = true;
 		if (node.x == endx && node.y == endy) {
 			return node;
 		}
@@ -90,19 +95,20 @@ public class StaticGraphic {
 		if (node.x > 0) {
 			push(node.x - 1, node.y, node);
 		}
-		if (node.x < endx) {
+		if (node.x < width-1) {
 			push(node.x + 1, node.y, node);
 		}
 		if (node.y > 0) {
 			push(node.x, node.y - 1, node);
 		}
-		if (node.y < endy) {
+		if (node.y < height-1) {
 			push(node.x, node.y + 1, node);
 		}
 		return find();
 	}
 
 	public NodeIterator search(int startX, int startY, int endX, int endY) {
+		init();
 		this.endx = endX;
 		this.endy = endY;
 		matrix[startX][startY] = 0;
@@ -123,7 +129,6 @@ public class StaticGraphic {
 			}else{
 				setLength(0);
 			}
-			visit[x][y] = true;
 		}
 
 		int x;

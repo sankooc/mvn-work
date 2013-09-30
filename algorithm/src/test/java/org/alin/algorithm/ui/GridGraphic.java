@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
@@ -49,16 +50,25 @@ public class GridGraphic extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	StaticGraphic graphic = new StaticGraphic();
-	final StaticGraphic sg = new StaticGraphic();
 	class OptionBar extends Panel {
+		int getValue(String v ,int dv){
+			if(null == v){
+				return dv;
+			}
+			try {
+				return Integer.parseInt(v);
+			} catch (NumberFormatException e) {
+				return dv;
+			}
+		}
 		OptionBar() {
 			LayoutManager layout = new GridLayout(5, 2, 10, 3);
 			this.setLayout(layout);
 			add(new JLabel("h size", SwingConstants.CENTER));
-			final JTextField text1 = new JTextField("20", 0);
+			final JTextField text1 = new JTextField("10", 0);
 			add(text1);
 			add(new JLabel("v size", SwingConstants.CENTER));
-			final JTextField text2 = new JTextField("20", 0);
+			final JTextField text2 = new JTextField("10", 0);
 			add(text2);
 			add(new JLabel("argorithm", SwingConstants.CENTER));
 			add(new JComboBox(new Object[] { "A*" }));
@@ -66,8 +76,8 @@ public class GridGraphic extends JFrame {
 			ramdom.addActionListener(new ActionListener() {
 
 				public void actionPerformed(ActionEvent e) {
-					int x = Integer.parseInt(text1.getText());
-					int y = Integer.parseInt(text2.getText());
+					int x = getValue(text1.getText(),10);
+					int y = getValue(text2.getText(),10);
 					graphic.setWidth(x);
 					graphic.setHeight(y);
 					init();
@@ -78,25 +88,21 @@ public class GridGraphic extends JFrame {
 			start.addActionListener(new ActionListener() {
 				
 				public void actionPerformed(ActionEvent e) {
-					Container container = GridGraphic.this.getContentPane();
 					Grid start = list.get(0);
 					Grid end = list.get(1);
 					System.out.println(start.x+":"+start.y);
 					System.out.println(end.x+":"+end.y);
 					NodeIterator iterator = graphic.search(start.x, start.y, end.x, end.y);
-					GridGraphic.this.printRoute(iterator);
+					if(null != iterator){
+						GridGraphic.this.printRoute(iterator);
+					}else{
+						JDialog dialog = new JDialog(GridGraphic.this,"cannot find path",true);
+						dialog.setVisible(true);
+					}
 				}
 			});
 			add(ramdom);
 			add(start);
-			this.setSize(this.getWidth(), 180);
-//			optionBar.layout();
-			this.doLayout();
-			this.setBackground(Color.CYAN);
-//			this.setColor(Color.CYAN);
-//			JLabel status_label = new JLabel("",SwingConstants.CENTER));
-//			JProgressBar progress = new JProgressBar();
-//			add(progress,BorderLayout.SOUTH);
 		}
 
 		
@@ -111,14 +117,15 @@ public class GridGraphic extends JFrame {
 
 	public void init() {
 		canvas.removeAll();
-		graphic.init();
-		canvas.setLayout(new GridLayout(graphic.width, graphic.height));
+		graphic.createRandomMatrix();
+		list.clear();
+		canvas.setLayout(new GridLayout(graphic.height,graphic.width));
 		for (int i = 0; i < graphic.height; i++) {
 			for (int j = 0; j < graphic.width; j++) {
 				if (graphic.matrix[j][i] == 1) {
-					canvas.add(new Grid(Color.BLACK,i,j));
+					canvas.add(new Grid(Color.BLACK,j,i));
 				} else {
-					canvas.add(new Grid(Color.BLUE,i,j));
+					canvas.add(new Grid(Color.BLUE,j,i));
 				}
 			}
 		}
@@ -153,17 +160,18 @@ public class GridGraphic extends JFrame {
 		super();
 		setSize(500, 500);
 		Container container = this.getContentPane();
-		BoxLayout layout = new BoxLayout(container,BoxLayout.Y_AXIS);
+//		LayoutManager layout = new BoxLayout(container,BoxLayout.Y_AXIS);
+		LayoutManager layout = new BorderLayout();
 		container.setLayout(layout);
 		optionBar = new OptionBar();
 		optionBar.setBounds(0, 0, 500, 200);
-		 container.add(optionBar);
+		 container.add(optionBar, BorderLayout.NORTH);
 		canvas = new Panel();
-		progress = new JProgressBar();
-		progress.setValue(50);
-		container.add(progress);
+//		progress = new JProgressBar();
+//		progress.setValue(50);
+//		container.add(progress);
 		canvas.setBackground(Color.WHITE);
-		container.add(canvas);
+		container.add(canvas,BorderLayout.CENTER);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				dispose();
@@ -174,7 +182,8 @@ public class GridGraphic extends JFrame {
 
 	public void path(int x, int y) {
 		Container container = this.getContentPane();
-		Grid component = (Grid) ((Container)(container.getComponent(2))).getComponent(y * 20 + x);
+		int index = y * graphic.width + x;
+		Grid component = (Grid) ((Container)(container.getComponent(1))).getComponent(index);
 		component.color = Color.red;
 		component.repaint();
 	}
@@ -247,14 +256,8 @@ public class GridGraphic extends JFrame {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		int a = 20;
-		int b = 20;
-		final StaticGraphic sg = new StaticGraphic(a, b);
-		sg.init();
-		// NodeIterator iterator = sg.search(0, 0, a - 1, b - 1);
 		GridGraphic graphic = new GridGraphic();
 		graphic.setVisible(true);
-		// graphic.printRoute(iterator);
 	}
 
 }
