@@ -1,4 +1,5 @@
-package org.alin.algorithm.routing;
+package org.alin.algorithm.routing.diagram;
+
 
 public class Archor {
 	GNode from;
