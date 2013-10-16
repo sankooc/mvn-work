@@ -3,14 +3,20 @@ package org.alin.algorithm.routing;
 import java.util.Random;
 
 public abstract class PathAlgorithm {
-	public int width;
-	public int height;
+	public int width = 20;
+	public int height = 20;
 	public boolean[][] matrix;
 	int endx;
 	int endy;
 	int startx;
 	int stopx;
-	Random random = new Random();
+	final Random random = new Random();
+
+	protected PathAlgorithm(int width, int height) {
+		this.width = width;
+		this.height = height;
+		createEmptyMatrix();
+	}
 
 	public boolean isBlock(int x, int y) {
 		return matrix[x][y];
@@ -20,8 +26,12 @@ public abstract class PathAlgorithm {
 		matrix[x][y] = value;
 	}
 
-	public void createRandomMatrix() {
+	public void createEmptyMatrix() {
 		matrix = new boolean[width][height];
+	}
+
+	public void createRandomMatrix() {
+		createEmptyMatrix();
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				if (random.nextInt(7) == 6) {
@@ -79,6 +89,6 @@ public abstract class PathAlgorithm {
 	public void setStopx(int stopx) {
 		this.stopx = stopx;
 	}
-//	public abstract void init();
+
 	public abstract NodeIterator search(int startX, int startY, int endX, int endY);
 }

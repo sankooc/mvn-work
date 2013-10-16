@@ -2,10 +2,18 @@ package org.alin.algorithm.routing;
 
 import java.util.TreeSet;
 
-
 public class Astar extends PathAlgorithm {
+	protected Astar(int width, int height) {
+		super(width, height);
+	}
+
 	boolean[][] visit;
 	int[][] gf;
+
+	public Astar() {
+		super(20, 20);
+	}
+
 	public void init() {
 		gf = new int[width][height];
 		visit = new boolean[width][height];
@@ -15,7 +23,9 @@ public class Astar extends PathAlgorithm {
 			}
 		}
 	}
+
 	TreeSet<Cnode> set = new TreeSet<Cnode>();
+
 	@Override
 	public NodeIterator search(int startX, int startY, int endX, int endY) {
 		init();
@@ -25,8 +35,8 @@ public class Astar extends PathAlgorithm {
 		matrix[endX][endY] = false;
 		set.clear();
 		push(startX, startY, null);
-//		return find();
-		while(true){
+		// return find();
+		while (true) {
 			if (set.isEmpty()) {
 				return null;
 			}
@@ -41,22 +51,24 @@ public class Astar extends PathAlgorithm {
 			if (node.x > 0) {
 				push(node.x - 1, node.y, node);
 			}
-			if (node.x < width-1) {
+			if (node.x < width - 1) {
 				push(node.x + 1, node.y, node);
 			}
 			if (node.y > 0) {
 				push(node.x, node.y - 1, node);
 			}
-			if (node.y < height-1) {
+			if (node.y < height - 1) {
 				push(node.x, node.y + 1, node);
 			}
 		}
 	}
-	Cnode lastNode; 
+
+	Cnode lastNode;
+
 	public Cnode find() {
-//		if (set.isEmpty()) {
-//			return null;
-//		}
+		if (set.isEmpty()) {
+			return null;
+		}
 		Cnode node = set.first();
 		lastNode = node;
 		set.remove(node);
@@ -68,23 +80,25 @@ public class Astar extends PathAlgorithm {
 		if (node.x > 0) {
 			push(node.x - 1, node.y, node);
 		}
-		if (node.x < width-1) {
+		if (node.x < width - 1) {
 			push(node.x + 1, node.y, node);
 		}
 		if (node.y > 0) {
 			push(node.x, node.y - 1, node);
 		}
-		if (node.y < height-1) {
+		if (node.y < height - 1) {
 			push(node.x, node.y + 1, node);
 		}
 		return find();
 	}
+
 	public double compute(double ax, double ay, double bx, double by) {
 		return Math.sqrt((ax - ay) * (ax - ay) + (bx - by) * (bx - by));
 	}
+
 	public void push(int x, int y, Cnode from) {
 
-		if(visit[x][y]){
+		if (visit[x][y]) {
 			return;
 		}
 		if (!matrix[x][y]) {
@@ -101,6 +115,7 @@ public class Astar extends PathAlgorithm {
 			}
 		}
 	}
+
 	class Cnode implements Comparable<Cnode>, NodeIterator {
 		Cnode(int x, int y, Cnode from) {
 			this.x = x;
@@ -109,7 +124,7 @@ public class Astar extends PathAlgorithm {
 			g = compute(x, y, endx, endy);
 			if (null != from) {
 				g += from.getLength();
-			}else{
+			} else {
 				setLength(0);
 			}
 		}
@@ -132,7 +147,7 @@ public class Astar extends PathAlgorithm {
 		}
 
 		public int compareTo(Cnode o) {
-			if(equals(o)){
+			if (equals(o)) {
 				return 0;
 			}
 			double r = o.g - g;
@@ -170,6 +185,6 @@ public class Astar extends PathAlgorithm {
 				return false;
 			return true;
 		}
-		
+
 	}
 }
