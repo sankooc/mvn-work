@@ -1,7 +1,6 @@
 package org.alin.algorithm.routing;
 
 import java.util.Random;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class StaticGraphic {
@@ -202,23 +201,12 @@ public class StaticGraphic {
 	public double compute(double ax, double ay, double bx, double by) {
 		return Math.sqrt((ax - ay) * (ax - ay) + (bx - by) * (bx - by));
 	}
-
-	// public void display(){
-	// for(int i=0;i<width;i++){
-	// for(int j=0;j<height;j++){
-	// if(){
-	//
-	// }
-	// System.out.print();
-	// }
-	// System.out.println();
-	// }
-	// }
 	public static void main(String[] args) {
 		int a = 120;
-		int b = 100;
+		int b = 80;
 		StaticGraphic sg = new StaticGraphic(a, b);
 		sg.init();
+		sg.createRandomMatrix();
 		long start = System.nanoTime();
 		NodeIterator path = sg.search(0, 0, a-1, b-1);
 		long end = System.nanoTime();
