@@ -44,10 +44,6 @@ import org.alin.algorithm.routing.NodeIterator;
 import org.alin.algorithm.routing.StaticGraphic;
 
 public class GridGraphic extends JFrame {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	StaticGraphic graphic = new StaticGraphic();
 	class OptionBar extends Panel {
